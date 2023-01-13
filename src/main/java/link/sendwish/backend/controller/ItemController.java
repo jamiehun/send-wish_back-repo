@@ -34,7 +34,7 @@ public class ItemController {
     private final MemberService memberService;
     private final CollectionService collectionService;
     Semaphore semaphore = new Semaphore(1);
-
+    Queue queue = new LinkedList<>();
 
     // scrapping-server 연결
     public JSONObject createHttpRequestAndSend(String url) throws InterruptedException {
@@ -50,19 +50,20 @@ public class ItemController {
 
         // Request_header, Request_body 합친 entity
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
-
-        semaphore.acquire();
+        queue.offer(entity);
+//        semaphore.acquire();
         JSONObject jsonObject = null;
 
         log.info("====START PARSING :" + MDC.get("traceId") + "====");
+
         try {
             jsonObject = new JSONObject(restTemplate
-                    .postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
+                    .postForObject("http://127.0.0.1:5000/webscrap", queue.poll(), String.class));
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
         } finally {
             log.info("====FINISH PARSING :" + MDC.get("traceId") + "====");
-            semaphore.release();
+//            semaphore.release();
         }
 
 
@@ -90,6 +91,7 @@ public class ItemController {
             String traceId = UUID.randomUUID().toString();
             MDC.put("traceId", traceId);
             log.info("====traceId :" + traceId + "====");
+
 
             JSONObject jsonObject = createHttpRequestAndSend(dto.getUrl());
 
