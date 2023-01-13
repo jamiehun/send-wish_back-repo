@@ -12,6 +12,7 @@ import link.sendwish.backend.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.slf4j.MDC;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,10 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 @Slf4j
@@ -36,6 +34,7 @@ public class ItemController {
     private final MemberService memberService;
     private final CollectionService collectionService;
     Semaphore semaphore = new Semaphore(1);
+
 
     // scrapping-server 연결
     public JSONObject createHttpRequestAndSend(String url) throws InterruptedException {
@@ -54,14 +53,18 @@ public class ItemController {
 
         semaphore.acquire();
         JSONObject jsonObject = null;
+
+        log.info("====START PARSING :" + MDC.get("traceId") + "====");
         try {
             jsonObject = new JSONObject(restTemplate
                     .postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
         } catch (Exception e) {
             log.error("Error: {}", e.getMessage());
         } finally {
+            log.info("====FINISH PARSING :" + MDC.get("traceId") + "====");
             semaphore.release();
         }
+
 
         return jsonObject;
     }
@@ -83,6 +86,10 @@ public class ItemController {
             /*
             * Python Server 호출, DB에 Item 등록
             * */
+            log.info("===============START CREATING===============");
+            String traceId = UUID.randomUUID().toString();
+            MDC.put("traceId", traceId);
+            log.info("====traceId :" + traceId + "====");
 
             JSONObject jsonObject = createHttpRequestAndSend(dto.getUrl());
 
@@ -95,6 +102,10 @@ public class ItemController {
                     .collectionItems(new ArrayList<>())
                     .build();
             Long saveItem = itemService.saveItem(item, dto.getNickname());
+
+            log.info("====traceId :" + MDC.get("traceId") + "====");
+            MDC.clear();
+            log.info("===============FINISH CREATING===============");
 
             return ResponseEntity.ok().body(saveItem);
         }catch (Exception e) {
