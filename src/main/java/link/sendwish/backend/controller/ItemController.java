@@ -23,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class ItemController {
 
         // Post 요청, JSONobject로 응답
         JSONObject jsonObject = new JSONObject(
-                restTemplate.postForObject("http://52.79.109.223:5000/webscrap", entity, String.class));
+                restTemplate.postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
 
         return jsonObject;
     }
