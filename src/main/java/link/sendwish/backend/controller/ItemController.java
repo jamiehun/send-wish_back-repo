@@ -33,9 +33,10 @@ public class ItemController {
     private final ItemService itemService;
     private final MemberService memberService;
     private final CollectionService collectionService;
+    public static Semaphore semaphore = new Semaphore(1);
 
     // scrapping-server 연결
-    public JSONObject createHttpRequestAndSend(String url) {
+    public JSONObject createHttpRequestAndSend(String url) throws InterruptedException {
         RestTemplate restTemplate = new RestTemplate();
 
         // Request_body 생성
@@ -49,9 +50,11 @@ public class ItemController {
         // Request_header, Request_body 합친 entity
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
 
+        semaphore.acquire();
         // Post 요청, JSONobject로 응답
         JSONObject jsonObject = new JSONObject(
                 restTemplate.postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
+        semaphore.release();
 
         return jsonObject;
     }
