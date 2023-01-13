@@ -35,7 +35,7 @@ public class ItemController {
     private final ItemService itemService;
     private final MemberService memberService;
     private final CollectionService collectionService;
-    private final LinkedList queue;
+    Semaphore semaphore = new Semaphore(1);
 
     // scrapping-server 연결
     public JSONObject createHttpRequestAndSend(String url) throws InterruptedException {
@@ -52,9 +52,16 @@ public class ItemController {
         // Request_header, Request_body 합친 entity
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
 
-
-        JSONObject jsonObject = new JSONObject(restTemplate
+        semaphore.acquire();
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(restTemplate
                     .postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage());
+        } finally {
+            semaphore.release();
+        }
 
         return jsonObject;
     }
@@ -76,10 +83,8 @@ public class ItemController {
             /*
             * Python Server 호출, DB에 Item 등록
             * */
-            queue.offer(dto.getUrl());
-            String url = (String) queue.poll();
 
-            JSONObject jsonObject = createHttpRequestAndSend(url);
+            JSONObject jsonObject = createHttpRequestAndSend(dto.getUrl());
 
             Item item = Item.builder()
                     .name((String)jsonObject.get("title"))
