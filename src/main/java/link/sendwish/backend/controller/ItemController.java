@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 @Slf4j
@@ -33,7 +35,7 @@ public class ItemController {
     private final ItemService itemService;
     private final MemberService memberService;
     private final CollectionService collectionService;
-    public static Semaphore semaphore = new Semaphore(1);
+    private final LinkedList queue;
 
     // scrapping-server 연결
     public JSONObject createHttpRequestAndSend(String url) throws InterruptedException {
@@ -50,11 +52,9 @@ public class ItemController {
         // Request_header, Request_body 합친 entity
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
 
-        semaphore.acquire();
-        // Post 요청, JSONobject로 응답
-        JSONObject jsonObject = new JSONObject(
-                restTemplate.postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
-        semaphore.release();
+
+        JSONObject jsonObject = new JSONObject(restTemplate
+                    .postForObject("http://127.0.0.1:5000/webscrap", entity, String.class));
 
         return jsonObject;
     }
@@ -76,7 +76,10 @@ public class ItemController {
             /*
             * Python Server 호출, DB에 Item 등록
             * */
-            JSONObject jsonObject = createHttpRequestAndSend(dto.getUrl());
+            queue.offer(dto.getUrl());
+            String url = (String) queue.poll();
+
+            JSONObject jsonObject = createHttpRequestAndSend(url);
 
             Item item = Item.builder()
                     .name((String)jsonObject.get("title"))
