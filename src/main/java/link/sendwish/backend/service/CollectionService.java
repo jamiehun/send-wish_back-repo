@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -260,7 +259,7 @@ public class CollectionService {
                     .findByCollectionAndItem(collection, item)
                     .orElseThrow(CollectionItemNotFoundException::new);
 
-            collectionItemRepository.deleteByCollectionAndItem(collection, item);
+            collectionItemRepository.delete(collectionItem);
             item.deleteCollectionItem(collectionItem);
             collection.deleteCollectionItem(collectionItem);
         }
