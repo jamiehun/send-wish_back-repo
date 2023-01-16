@@ -25,15 +25,14 @@ public class ChatRoom extends BaseTime{
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatRoomMessage> chatRoomMessages = new ArrayList<>();
 
-    public void addMemberChatRoom(ChatRoomMember chatRoomMember) {
-        this.chatRoomMembers.add(chatRoomMember);
-    }
+    /// chatRoomMembers 리스트에 chatRoomMember 추가
+    public void addMemberChatRoom(ChatRoomMember chatRoomMember) { this.chatRoomMembers.add(chatRoomMember); }
 
     public void deleteMemberChatRoom(ChatRoomMember chatRoomMember) {
         this.chatRoomMembers.remove(chatRoomMember);
     }
 
-    public void addMessageChatRoom(ChatRoomMessage chatRoomMessage) {
+    public void addMessageChatRoom(ChatRoomMessage chatRoomMessage) { /// chatRoom에 있는 메시지들을 추가하는 메소드
         this.chatRoomMessages.add(chatRoomMessage);
     }
 

@@ -21,14 +21,14 @@ public class ChatRoomController {
     private final ChatService chatService;
     private final MemberService memberService;
 
-    // 채팅 리스트 화면
+    /// 채팅 리스트 화면
     @GetMapping("/room")
     public String rooms(Model model) {
         return "/chat/room";
     }
 
 
-    // 모든 채팅방 목록 조회
+    /// 모든 채팅방 목록 조회
     @GetMapping("/rooms/{nickname}")
     public ResponseEntity<?> getRoomsByMember(@PathVariable("nickname") String nickname) {
         try{
@@ -46,7 +46,7 @@ public class ChatRoomController {
         }
     }
 
-    // 채팅방 생성
+    /// 채팅방 생성
     @PostMapping("/room")
     public ResponseEntity<?> createRoom(@RequestBody ChatRoomRequestDto dto) {
         try{
@@ -61,11 +61,11 @@ public class ChatRoomController {
         }
     }
 
-    // 채팅방 입장
+    /// 채팅방 입장화면
     @GetMapping("/room/enter/{roomId}")
     public ResponseEntity<?> roomDetail(@PathVariable("roomId") Long roomId) {
         try{
-            ChatRoomResponseDto room = chatService.findRoomById(roomId);
+            ChatRoomResponseDto room = chatService.findRoomById(roomId); /// 룸 아이디를 받아서 룸 정보를 넘김
             return ResponseEntity.ok().body(room);
         }catch (Exception e) {
             e.printStackTrace();

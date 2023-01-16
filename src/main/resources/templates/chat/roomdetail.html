@@ -43,7 +43,7 @@
 <script>
   //alert(document.title);
   // websocket & stomp initialize
-  var sock = new SockJS("/ws/chat");
+  var sock = new SockJS("/ws/chat"); // Client에서 websocket 연결시 사용할 API 경로를 설정
   var ws = Stomp.over(sock);
   var reconnect = 0;
   // vue.js
