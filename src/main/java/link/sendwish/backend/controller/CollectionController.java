@@ -219,6 +219,7 @@ public class CollectionController {
         }
     }
 
+    /// 룸의 아이디 받기 (collectionId를 받으면 룸의 아이디가 나옴)
     @GetMapping("/collection/roomId/{collectionId}")
     public ResponseEntity<?> getRoomId(@PathVariable("collectionId") Long collectionId) {
         try {

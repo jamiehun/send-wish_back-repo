@@ -18,7 +18,7 @@ public class MessageController {
     private final ChatService chatService;
     private final SimpMessageSendingOperations simpMessagingTemplate;
 
-    @MessageMapping("/chat") // 해당 url로 메세지 전송되면 메서드 호출
+    @MessageMapping("/chat") /// 해당 url로 메세지 전송되면 메서드 호출
     public void sendMessage(ChatMessageRequestDto dto){
         ChatMessageResponseDto responseDto = chatService.saveChatMessage(dto);
         simpMessagingTemplate

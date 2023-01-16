@@ -11,6 +11,7 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class BackendApplication {
 
+	/// 스프링부트 서버 시간대 한국 시간으로 설정
 	@PostConstruct
 	public void setTimeZone() {
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
