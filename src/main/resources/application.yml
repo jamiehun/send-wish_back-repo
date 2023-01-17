@@ -31,5 +31,3 @@ logging:
     com.zaxxer.hikari: TRACE
 
 
-
-
